@@ -13,6 +13,7 @@
 #include <tchar.h>
 #include <chrono>
 #include <iostream>
+#include <cmath>
 
 // Data
 static ID3D11Device*            g_pd3dDevice = nullptr;
@@ -162,60 +163,60 @@ int main(int, char**)
         ImGui::NewFrame();
 
         //ImGui Style
-            ImGuiStyle& style = ImGui::GetStyle();
+        ImGuiStyle& style = ImGui::GetStyle();
 
         // Window
-            ImGui::SetNextWindowSize(ImVec2(500,500)); 
-            ImGui::Begin("Dear ImGui DirectX11 Calculator App", &opened , ImGuiWindowFlags_MenuBar);
+        ImGui::SetNextWindowSize(ImVec2(500, 500));
+        ImGui::Begin("Dear ImGui DirectX11 Calculator App", &opened, ImGuiWindowFlags_MenuBar);
 
-            
-            // Window Elements
 
-            ImGui::Text("Dimensions: %d x %d", width, height); 
-            ImGui::Text("FPS: %d", fps); 
+        // Window Elements
 
-            ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
+        ImGui::Text("Dimensions: %d x %d", width, height);
+        ImGui::Text("FPS: %d", fps);
 
-            if (strlen(name) == 0)
-                ImGui::Text("Hello world!");
-            else
-                ImGui::Text("Hello %s", name); 
-            ImGui::Text("Button Clicks = %d" , button_clicks);
-            
-            if(ImGui::Button("Click Me"))
-                button_clicks++; 
-            if (ImGui::IsItemHovered()) 
-                ImGui::SetTooltip("This is a tooltip for the button"); 
+        ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
 
-            if (ImGui::Button("Reset")) 
-                button_clicks = 0; 
+        if (strlen(name) == 0)
+            ImGui::Text("Hello world!");
+        else
+            ImGui::Text("Hello %s", name);
+        ImGui::Text("Button Clicks = %d", button_clicks);
 
-            if (ImGui::Button("Open Calc(short for calculator)")) 
-            {
-                show_calculator = true; 
-            }
-            ImGui::SliderInt("Slider",&intslider,0,100); 
-            ImGui::InputInt("Input Int", &intslider); 
-            if (ImGui::IsItemHovered()) 
-                ImGui::SetTooltip("This is a tooltip for the slider"); 
+        if (ImGui::Button("Click Me"))
+            button_clicks++;
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("This is a tooltip for the button");
 
-            ImGui::SliderFloat("##floatslider", &fslider, -50.0f, 100.0f); 
-            if(ImGui::IsItemHovered()) 
-                ImGui::SetTooltip("try to find the value of pi "); 
-            if (fslider == 3.141f) 
-                ImGui::Text("Good work");
-            if (ImGui::Checkbox("Cheat(loser)", &checkbox)) { 
-                
-                if (checkbox)
-                    fslider = 3.141f;
-            }
-            if (ImGui::IsItemHovered()) 
-                ImGui::SetTooltip(" "); 
+        if (ImGui::Button("Reset"))
+            button_clicks = 0;
 
-            if (ImGui::Button("Color Picker"))
-                show_color_picker = !show_color_picker;
-            if (show_color_picker)
-                ImGui::ColorPicker3("Color", clr);
+        if (ImGui::Button("Open Calc(short for calculator)"))
+        {
+            show_calculator = true;
+        }
+        ImGui::SliderInt("Slider", &intslider, 0, 100);
+        ImGui::InputInt("Input Int", &intslider);
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("This is a tooltip for the slider");
+
+        ImGui::SliderFloat("##floatslider", &fslider, -50.0f, 100.0f);
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip("try to find the value of pi ");
+        if (fslider == 3.141f)
+            ImGui::Text("Good work");
+        if (ImGui::Checkbox("Cheat(loser)", &checkbox)) {
+
+            if (checkbox)
+                fslider = 3.141f;
+        }
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip(" ");
+
+        if (ImGui::Button("Color Picker"))
+            show_color_picker = !show_color_picker;
+        if (show_color_picker)
+            ImGui::ColorPicker3("Color", clr);
 
 
         ImGui::End();
@@ -227,8 +228,7 @@ int main(int, char**)
             static int result = 0;
             static bool next = false;
 
-            static bool subtract = false; static bool add = false;  static bool multiply = false; static bool divide = false;
-           
+            static bool subtract = false; static bool add = false;  static bool multiply = false; static bool divide = false; static bool power = false; //operators
 
             ImGuiStyle& style = ImGui::GetStyle();
 
@@ -239,226 +239,95 @@ int main(int, char**)
             ImGui::Text("second number = %i", b);
             ImGui::Text("result = %i", result);
 
-            if (ImGui::Button("1", ImVec2(60, 60))) {   //lord save me
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 1;
+            for (int i = 1; i <= 9; i++) {                        //NUMBER BUTTONS
+                char label[8];
+                snprintf(label, sizeof(label), "%d", i);
+                if (ImGui::Button(label, ImVec2(60, 60))) {
+                    if (next) {
+                        if (b != 0) {
+                            b = (b * 10) + i;
+                        }
+                        else
+                            b = i;
                     }
-                    else
-                        b = 1;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 1;
+                    else {
+                        if (a != 0) {
+                            a = (a * 10) + i;
+                        }
+                        else
+                            a = i;
                     }
-                    else
-                        a = 1;
                 }
+                if (i % 3 != 0) ImGui::SameLine();
+                else {}
+            }
 
+            if (ImGui::Button("Clear", ImVec2(60, 60))) {                    //CLEAR BUTTON
+                a = 0; b = 0;
+                next = false;
+                add = false; subtract = false; multiply = false; divide = false; result = 0;
             }
-            ImGui::SameLine();
-            if (ImGui::Button("2", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 2;
-                    }
-                    else
-                        b = 2;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 2;
-                    }
-                    else
-                        a = 2;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("3", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 3;
-                    }
-                    else
-                        b = 3;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 3;
-                    }
-                    else
-                        a = 3;
-                }
-            }
-            ImGui::SameLine();
-                if (ImGui::Button("+", ImVec2(60, 60))) {
-                    next = true; add = true;
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("/", ImVec2(60, 60))) {
-                    next = true;  divide = true;
-                }
-            ImGui::NewLine();
-            if (ImGui::Button("4", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 4;
-                    }
-                    else
-                        b = 4;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 4;
-                    }
-                    else
-                        a = 4;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("5", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 5;
-                    }
-                    else
-                        b = 5;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 5;
-                    }
-                    else
-                        a = 5;
-                }
 
-            }
             ImGui::SameLine();
-            if (ImGui::Button("6", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 6;
-                    }
-                    else
-                        b = 6;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 6;
-                    }
-                    else
-                        a = 6;
-                }
 
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("-", ImVec2(60, 60))) {
-                next = true; subtract = true;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("=", ImVec2(60, 60))) {
-                result = (add ? (b + a) : ((subtract) ? (a - b) : ((multiply) ? (a * b) : ((divide) ? (a / b) : 0))));
-
-            }
-            ImGui::NewLine();
-            if (ImGui::Button("7", ImVec2(60, 60))) {
-                if (next == true) {
+            if (ImGui::Button("0", ImVec2(60, 60))) {                        //ZERO BUTTON
+                if (next) {
                     if (b != 0) {
-                        b = (b * 10) + 7;
-                    }
-                    else
-                        b = 7;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 7;
-                    }
-                    else
-                        a = 7;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("8", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 8;
-                    }
-                    else
-                        b = 8;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 8;
-                    }
-                    else
-                        a = 8;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("9", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 9;
-                    }
-                    else
-                        b = 9;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10) + 9;
-                    }
-                    else
-                        a = 9;
-                }
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("*", ImVec2(60, 60))) {
-                next = true; multiply = true;
-            }
-            ImGui::NewLine();
-            if (ImGui::Button("0", ImVec2(60, 60))) {
-                if (next == true) {
-                    if (b != 0) {
-                        b = (b * 10) + 0;
+                        b = (b * 10);
                     }
                     else
                         b = 0;
                 }
                 else {
                     if (a != 0) {
-                        a = (a * 10) + 0;
+                        a = (a * 10);
                     }
                     else
                         a = 0;
                 }
             }
 
+            ImGui::SameLine();
 
-
-            
-
-            if (ImGui::Button("Repeat", ImVec2(80, 60))) {
-                if (add) {
-                    a = result; b = 0; next = false;
-                }
-                else if (subtract) {
-                    a = result; b = 0; next = false;
-                }
-                else if (multiply) {
-                    a = result; b = 0; next = false;
-                }
-                else if (divide) {
-                    a = result; b = 0; next = false;
-                }
-            }
-            if(ImGui::Button("Clear", ImVec2(60, 60))) {
-                a = 0; 
-                b = 0; 
-                add = false; multiply = false, subtract = false, divide = false; next = false; result = false;
+            if (ImGui::Button("=", ImVec2(60, 60))) {
+                result = (add) ? (a + b) : ((subtract) ? (a - b) : ((multiply) ? (a * b) : ((divide) ? (a / b) : (power) ? pow(a, b) : 0)));
+                //added parentheses for clarification
             }
 
-            ImGui::End();
+            ImGui::NewLine();
+
+            if (ImGui::Button("/", ImVec2(60, 60))) { //  / BUTTON
+                if (a != 0) {
+                    next = true; divide = true;
+                }
+            } ImGui::SameLine();
+
+            if (ImGui::Button("*", ImVec2(60, 60))) { //* BUTTON
+                if (a != 0) {
+                    next = true; multiply = true;
+                }
+            } ImGui::SameLine();
+
+            if (ImGui::Button("+", ImVec2(60, 60))) { //+ BUTTON
+                if (a != 0) {
+                    next = true; add = true;
+                }
+            } ImGui::SameLine();
+
+            if (ImGui::Button("-", ImVec2(60, 60))) { //- BUTTON
+                if (a != 0) {
+                    next = true; subtract = true;
+                }
+            } ImGui::SameLine();
+
+            if (ImGui::Button("^x", ImVec2(60, 60))) { //^x BUTTON
+                if (a != 0) {
+                    next = true; power = true;
+                }
+            }
         }
+        ImGui::End();
+    }
 
         // Rendering
         ImGui::Render();
@@ -471,7 +340,7 @@ int main(int, char**)
         //HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
         HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync 
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-    }
+    
 
     // Cleanup
     ImGui_ImplDX11_Shutdown();
