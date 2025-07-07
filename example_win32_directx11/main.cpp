@@ -102,14 +102,14 @@ int main(int, char**)
     bool opened = true;
     bool done = false;
 
-    char name[30] = ""; 
-    float clr[3] = { 0.0f, 0.0f, 0.0f }; 
+    char name[30] = "";
+    float clr[3] = { 0.0f, 0.0f, 0.0f };
     bool show_color_picker = false;
-    int button_clicks = 0; 
+    int button_clicks = 0;
     bool checkbox = false;
     bool show_calculator = false; // Flag to show/hide the second window
 
-    int intslider = 10; 
+    int intslider = 10;
     float fslider = 10.0f; //slider variable
 
     static auto last_time = std::chrono::high_resolution_clock::now(); // Last frame time
@@ -229,6 +229,7 @@ int main(int, char**)
             static bool next = false;
 
             static bool subtract = false; static bool add = false;  static bool multiply = false; static bool divide = false; static bool power = false; //operators
+            static bool root = false;
 
             ImGuiStyle& style = ImGui::GetStyle();
 
@@ -324,24 +325,28 @@ int main(int, char**)
                 if (a != 0) {
                     next = true; power = true;
                 }
-            }  ImGui::End();
-        }
+            }
+            if (ImGui::Button("^1/x", ImVec2(60, 60))) { // ^1/x BUTTON
+                if (a != 0) {
+                    next = true; root = true;
+                }
+            } ImGui::End();
+        } 
+    
 
+    // Rendering
+    ImGui::Render();
+    const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
+    g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
+    g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
+    // Present
+    //HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
+    HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync 
+    g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
 
-        // Rendering
-        ImGui::Render();
-        const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
-        g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, nullptr);
-        g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-        // Present
-        //HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
-        HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync 
-        g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-
-    }
+    }//MAKE SURE RENDERING IS UNDER THE LOOP.
     // Cleanup
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
