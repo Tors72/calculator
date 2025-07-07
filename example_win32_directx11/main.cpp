@@ -13,7 +13,7 @@
 #include <tchar.h>
 #include <chrono>
 #include <iostream>
-#include <cmath>
+#include <cmath>   //ERROR BECAUSE CALC.EXE IN ANOTHER SUBFOLDER THAN EXPECTED
 
 // Data
 static ID3D11Device*            g_pd3dDevice = nullptr;
@@ -324,10 +324,10 @@ int main(int, char**)
                 if (a != 0) {
                     next = true; power = true;
                 }
-            }
+            }  ImGui::End();
         }
-        ImGui::End();
-    }
+
+
 
         // Rendering
         ImGui::Render();
@@ -340,8 +340,8 @@ int main(int, char**)
         //HRESULT hr = g_pSwapChain->Present(1, 0);   // Present with vsync
         HRESULT hr = g_pSwapChain->Present(0, 0); // Present without vsync 
         g_SwapChainOccluded = (hr == DXGI_STATUS_OCCLUDED);
-    
 
+    }
     // Cleanup
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
