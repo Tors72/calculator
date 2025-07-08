@@ -176,160 +176,127 @@ int main(int, char**)
         ImGui::Text("FPS: %d", fps);
 
         ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
+        (strlen(name) == 0) ? ImGui::Text("Hello world!"): ImGui::Text("Hello %s", name);
 
-        if (strlen(name) == 0)
-            ImGui::Text("Hello world!");
-        else
-            ImGui::Text("Hello %s", name);
         ImGui::Text("Button Clicks = %d", button_clicks);
-
         if (ImGui::Button("Click Me"))
             button_clicks++;
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("This is a tooltip for the button");
-
+        //if (ImGui::IsItemHovered())
+            //ImGui::SetTooltip("This is a tooltip for the button");
+        ImGui::SameLine();
         if (ImGui::Button("Reset"))
             button_clicks = 0;
 
         if (ImGui::Button("Open Calc(short for calculator)"))
-        {
             show_calculator = true;
-        }
-        ImGui::SliderInt("Slider", &intslider, 0, 100);
-        ImGui::InputInt("Input Int", &intslider);
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("This is a tooltip for the slider");
+        
 
         ImGui::SliderFloat("##floatslider", &fslider, -50.0f, 100.0f);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("try to find the value of pi ");
-        if (fslider == 3.141f)
-            ImGui::Text("Good work");
-        if (ImGui::Checkbox("Cheat(loser)", &checkbox)) {
 
-            if (checkbox)
-                fslider = 3.141f;
-        }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip(" ");
+        if (fslider == 3.141f)  ImGui::Text("Good work");
+        if (ImGui::Checkbox("Cheat(loser)", &checkbox) && checkbox)  fslider = 3.141f;
 
-        if (ImGui::Button("Color Picker"))
-            show_color_picker = !show_color_picker;
-        if (show_color_picker)
-            ImGui::ColorPicker3("Color", clr);
+        ImGui::End();   //SAMPLE WINDOW END
 
 
-        ImGui::End();
+        //2. CALCULATOR WINDOW
 
         if (show_calculator)
         {
-            static int a = 0;
-            static int b = 0;
-            static int result = 0;
+            static long double a = 0;
+            static long double b = 0;
+            static long double result = 0;
             static bool next = false;
+			static int a_dec_places = 0; 
+			static int b_dec_places = 0; 
 
             static bool subtract = false; static bool add = false;  static bool multiply = false; static bool divide = false; static bool power = false; //operators
-            static bool root = false;
-
-            ImGuiStyle& style = ImGui::GetStyle();
+            static bool root = false; static bool decadd = false;
 
             ImGui::Begin("Actual Calculator", &show_calculator); // Pass pointer for close button
             ImGui::Text("Calculator");
             ImGui::Text("");
-            ImGui::Text("first number = %i", a);
-            ImGui::Text("second number = %i", b);
-            ImGui::Text("result = %i", result);
+            ( a == int (a) ) ? ImGui::Text("first number = %i", (int)a) : ImGui::Text("first number = %Lf", a);
+            ( b == int(b) ) ? ImGui::Text("second number = %i", (int)b) : ImGui::Text("second number = %Lf", b);
+			(result == int(result)) ? ImGui::Text("result = %i", (int)result) : ImGui::Text("result = %Lf", result);
+            
 
             for (int i = 1; i <= 9; i++) {                        //NUMBER BUTTONS
                 char label[8];
-                snprintf(label, sizeof(label), "%d", i);
-                if (ImGui::Button(label, ImVec2(60, 60))) {
-                    if (next) {
-                        if (b != 0) {
-                            b = (b * 10) + i;
-                        }
-                        else
-                            b = i;
-                    }
-                    else {
-                        if (a != 0) {
-                            a = (a * 10) + i;
-                        }
-                        else
-                            a = i;
-                    }
-                }
+                snprintf(label, sizeof(label), "%i", i);
+                if (ImGui::Button(label, ImVec2(60, 60))) 
+                    (next)
+                    ? (decadd
+                        ? (b += i * pow(10.0f, --b_dec_places))
+                        : (b = b * 10 + i))
+                    : (decadd
+                        ? (a += i * pow(10.0f, --a_dec_places))
+                        : (a = a * 10 + i));
+                ;
                 if (i % 3 != 0) ImGui::SameLine();
-                else {}
             }
 
             if (ImGui::Button("Clear", ImVec2(60, 60))) {                    //CLEAR BUTTON
                 a = 0; b = 0;
                 next = false;
-                add = false; subtract = false; multiply = false; divide = false; result = 0;
-            }
+                add = false; subtract = false; multiply = false; divide = false; power = false; root = false; decadd = false; result = 0; a_dec_places = 0; b_dec_places = 0;
+            } ImGui::SameLine();
 
-            ImGui::SameLine();
+            if (ImGui::Button("0", ImVec2(60, 60)))                         //ZERO BUTTON
+                (next&& b != 0) 
+                ? (b = (b * 10) + 0) 
+                : (next) 
+                       ? (b = 0)
+                       : (a != 0) 
+                                ? (a = (a * 10) + 0)
+                                : (a = 0);
+              ImGui::SameLine();
 
-            if (ImGui::Button("0", ImVec2(60, 60))) {                        //ZERO BUTTON
-                if (next) {
-                    if (b != 0) {
-                        b = (b * 10);
-                    }
-                    else
-                        b = 0;
-                }
-                else {
-                    if (a != 0) {
-                        a = (a * 10);
-                    }
-                    else
-                        a = 0;
-                }
-            }
-
-            ImGui::SameLine();
-
-            if (ImGui::Button("=", ImVec2(60, 60))) {
-                result = (add) ? (a + b) : ((subtract) ? (a - b) : ((multiply) ? (a * b) : ((divide) ? (a / b) : (power) ? pow(a, b) : 0)));
-                //added parentheses for clarification
-            }
-
+            if (ImGui::Button("=", ImVec2(60, 60))) 
+                result = add 
+                            ? (a + b) 
+                            : subtract 
+                                        ? (a - b)
+                                        : multiply
+                                                    ? (a * b)
+                                                    : divide
+                                                                ? (a / b)
+                                                                : power 
+                                                                        ? pow(a, b)
+                                                                        : root 
+                                                                                ? pow(a,1/b) 
+                                                                                : 0 ;
+			
+            //added parentheses for clarification
+            
             ImGui::NewLine();
 
-            if (ImGui::Button("/", ImVec2(60, 60))) { //  / BUTTON
-                if (a != 0) {
-                    next = true; divide = true;
-                }
+            if (ImGui::Button("/", ImVec2(60, 60)) && a != 0 ) { //  / BUTTON
+                next = true; divide = true; decadd = false;
             } ImGui::SameLine();
 
-            if (ImGui::Button("*", ImVec2(60, 60))) { //* BUTTON
-                if (a != 0) {
-                    next = true; multiply = true;
-                }
-            } ImGui::SameLine();
+            if (ImGui::Button("*", ImVec2(60, 60)) && a != 0 ) { //* BUTTON
+                    next = true; multiply = true; decadd = false;
+                } ImGui::SameLine();
 
-            if (ImGui::Button("+", ImVec2(60, 60))) { //+ BUTTON
-                if (a != 0) {
-                    next = true; add = true;
-                }
-            } ImGui::SameLine();
+            if (ImGui::Button("+", ImVec2(60, 60)) && a != 0 ) { //+ BUTTON
+                    next = true; add = true; decadd = false;
+                } ImGui::SameLine();
 
-            if (ImGui::Button("-", ImVec2(60, 60))) { //- BUTTON
-                if (a != 0) {
-                    next = true; subtract = true;
-                }
-            } ImGui::SameLine();
+            if (ImGui::Button("-", ImVec2(60, 60)) && a != 0) { //- BUTTON
+                    next = true; subtract = true; decadd = false;
+               } ImGui::SameLine();
 
-            if (ImGui::Button("^x", ImVec2(60, 60))) { //^x BUTTON
-                if (a != 0) {
-                    next = true; power = true;
-                }
-            }
-            if (ImGui::Button("^1/x", ImVec2(60, 60))) { // ^1/x BUTTON
-                if (a != 0) {
-                    next = true; root = true;
-                }
+            if (ImGui::Button("^x", ImVec2(60, 60)) && a != 0) { //^x BUTTON
+                    next = true; power = true; decadd = false;
+                } 
+            if (ImGui::Button("^1/x", ImVec2(60, 60)) && a != 0) { // ^1/x BUTTON
+                    next = true; root = true; decadd = false;
+            } ImGui::SameLine();
+            if (ImGui::Button(".", ImVec2(60, 60)) && a != 0) {   // DECIMAL . BUTTON
+                decadd = !decadd;
             } ImGui::End();
         } 
     
