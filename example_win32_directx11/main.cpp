@@ -254,20 +254,26 @@ int main(int, char**)
                                 : (a = 0);
               ImGui::SameLine();
 
-            if (ImGui::Button("=", ImVec2(60, 60))) 
-                result = add 
-                            ? (a + b) 
-                            : subtract 
-                                        ? (a - b)
-                                        : multiply
-                                                    ? (a * b)
-                                                    : divide
-                                                                ? (a / b)
-                                                                : power 
-                                                                        ? pow(a, b)
-                                                                        : root 
-                                                                                ? pow(a,1/b) 
-                                                                                : 0 ;
+              if (ImGui::Button("=", ImVec2(60, 60))) {
+                  int x;
+                    result == 0
+                      ? x = a 
+                      : x = result;
+
+                  result = add 
+                      ? (x + b)
+                      : subtract
+                      ? (x - b)
+                      : multiply
+                      ? (x * b)
+                      : divide
+                      ? (x / b)
+                      : power
+                      ? pow(x, b)
+                      : root
+                      ? pow(x, 1 / b)
+                      : 0;
+              }
 			
             //added parentheses for clarification
             
