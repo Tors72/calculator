@@ -58,7 +58,9 @@ int main(int, char**)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO& io = ImGui::GetIO(); (void)io;  //FONTS
+    io.Fonts->AddFontFromFileTTF("imgui/misc/fonts/Cousine-Regular.ttf", 24.0f);
+
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -108,6 +110,7 @@ int main(int, char**)
     int button_clicks = 0;
     bool checkbox = false;
     bool show_calculator = false; // Flag to show/hide the second window
+	bool show_calculator2 = false; // Flag to show/hide the second calculator window
 
     int intslider = 10;
     float fslider = 10.0f; //slider variable
@@ -164,68 +167,46 @@ int main(int, char**)
 
         //ImGui Style
         ImGuiStyle& style = ImGui::GetStyle();
+        style.Colors[ImGuiCol_Button] = ImVec4( 203 / 255.0f, 255 / 255.0f, 203 / 255.0f, 1.0f); //205,155,89
+        style.Colors[ImGuiCol_ButtonHovered] = ImVec4( 143 / 255.0f, 78 / 255.0f, 81 / 255.0f, 1.0f); //143, 78, 81
+        style.Colors[ImGuiCol_ButtonActive] = ImVec4( 108 / 255.0f, 37 / 255.0f, 103 / 255, 1.0f);
+		style.Colors[ImGuiCol_WindowBg] = ImVec4( 221 / 255.0f, 221 / 255.0f, 221 / 255.0f, 1.0f); // 209, 176, 132
+        style.Colors[ImGuiCol_Text] = ImVec4(.0f, .0f, .0f, 1.0f);
+		style.FrameRounding = 10.0f; 
+        style.WindowRounding = 5.0f;
+
 
         // Window
-        ImGui::SetNextWindowSize(ImVec2(500, 500));
-        ImGui::Begin("Demo Window", &opened );
-
-
-        // Window Elements
-
-            // 1. Sample Window
-
-        ImGui::Text("Dimensions: %d x %d", width, height);
-        ImGui::Text("FPS: %d", fps);
-
-        ImGui::InputText("Name", name, IM_ARRAYSIZE(name));
-        (strlen(name) == 0) 
-            ? ImGui::Text("Hello world!")
-            : ImGui::Text("Hello %s", name);
-
-        ImGui::Text("Button Clicks = %d", button_clicks);
-        if (ImGui::Button("Click Me"))
-            button_clicks++;
-
-        //if (ImGui::IsItemHovered())
-            //ImGui::SetTooltip("This is a tooltip for the button");
-
-        ImGui::SameLine();
-        if (ImGui::Button("Reset"))
-            button_clicks = 0;
-
-        if (ImGui::Button("Open Calc(short for calculator)"))  show_calculator = true;
-        
-        ImGui::End();   // Sample Window End
-
-
-            //2. Calculator Window
-
-        if (show_calculator)
-        {
-            static long double a = 0;
-            static long double b = 0;
-            static long double result = 0;
+       
+            static long double a = 0; static long double b = 0; static long double result = 0;
 			static bool next = false;  // next turns true on clicking an operator button, so that the numbers after the operator are added to b instead of a
 
+            static bool decadd = false;
 			static int a_dec_places = 0;  // for adding values before the decimal point
 			static int b_dec_places = 0; 
 
             static bool subtract = false; static bool add = false;  static bool multiply = false; static bool divide = false; static bool power = false; //operators
-            static bool root = false; static bool decadd = false;
+            static bool root = false;
 
-            ImGui::Begin("Actual Calculator", &show_calculator); 
-            ImGui::Text("Calculator");
-            ImGui::Text("");
+            ImGui::Begin("Calculator", &show_calculator); 
 
-            ( a == int (a) ) ? ImGui::Text("first number = %i", (int)a) : ImGui::Text("first number = %Lf", a);  //truncates value if integer
-            ( b == int(b) ) ? ImGui::Text("second number = %i", (int)b) : ImGui::Text("second number = %Lf", b);
-			(result == int(result)) ? ImGui::Text("result = %i", (int)result) : ImGui::Text("result = %Lf", result);
+            ( a == int (a) ) 
+                ? ImGui::Text("first number = %i", (int)a) 
+                : ImGui::Text("first number = %Lf", a);              //truncates value if integer
+
+            ( b == int(b) ) 
+                ? ImGui::Text("second number = %i", (int)b)    
+                : ImGui::Text("second number = %Lf", b);      
+
+			(result == int(result)) 
+                ? ImGui::Text("result = %i", (int)result)      
+                : ImGui::Text("result = %Lf", result);
             
 
             for (int i = 1; i <= 9; i++) {                        // buttons for numbers 1-9
                 char label[8];
                 snprintf(label, sizeof(label), "%i", i);
-                if (ImGui::Button(label, ImVec2(60, 60))) 
+                if (ImGui::Button(label, ImVec2(80, 80))) 
                     (next)
                     ? (decadd
                         ? (b += i * pow(10.0f, --b_dec_places))
@@ -236,73 +217,91 @@ int main(int, char**)
                 
                 if (i % 3 != 0) ImGui::SameLine();
             }
+            // ImGui::PushStyleColor(ImGuiCol_Button, ImVec4( 161 / 255.0f , 214 / 255.0f, 161 / 255.0f , 1.0f));
 
-            if (ImGui::Button("Clear", ImVec2(60, 60))) {                    // clear button
-                a = 0; b = 0;
-                next = false;
-                add = false; subtract = false; multiply = false; divide = false; power = false; root = false; decadd = false; result = 0; a_dec_places = 0; b_dec_places = 0;
-            } ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4( 147 / 255.0f, 204 / 255.0f, 147 / 255.0f, 1.0f));
+              {
+                if (ImGui::Button("CE", ImVec2(80, 80))) {                    // clear button
+                    a = 0; b = 0;
+                    next = false;
+                    add = false; subtract = false; multiply = false; divide = false; power = false; root = false; decadd = false; result = 0; a_dec_places = 0; b_dec_places = 0;
+                } ImGui::SameLine();
+              }   
+            ImGui::PopStyleColor();
 
-            if (ImGui::Button("0", ImVec2(60, 60)))                         // zero button
-                (next&& b != 0) 
-                ? (b = (b * 10) + 0) 
-                : (next) 
-                       ? (b = 0)
-                       : (a != 0) 
-                                ? (a = (a * 10) + 0)
-                                : (a = 0);
+            if (ImGui::Button("0", ImVec2(80, 80))) {                      // zero button
+                (next && b != 0)
+                    ? (b = (b * 10) + 0)
+                    : (next)
+                        ? (b = 0)
+                        : (a != 0)
+                            ? (a = (a * 10) + 0)
+                            : (a = 0);
+            }
               ImGui::SameLine();
 
-              if (ImGui::Button("=", ImVec2(60, 60))) {
+              ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(147 / 255.0f, 204 / 255.0f, 147 / 255.0f, 1.0f));
+              
+              if (ImGui::Button("=", ImVec2(80, 80))) {
                   int x;
-                    result == 0
-                      ? x = a 
+                  result == 0
+                      ? x = a
                       : x = result;
-
-                  result = add 
+                  result = add
                       ? (x + b)
                       : subtract
                         ? (x - b)
                         : multiply
                             ? (x * b)
                             : divide
-                                 ? (x / b)
-                                 : power
+                                ? (x / b)
+                                : power
                                     ? pow(x, b)
                                     : root
                                         ? pow(x, 1 / b)
                                         : 0;
-              }
+              } ImGui::PopStyleColor(1);
+               
 
-            ImGui::NewLine();
+            ImGui::NewLine(); //161, 214, 161
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4( 161 / 255.0f , 214 / 255.0f, 161 / 255.0f , 1.0f));
 
-            if (ImGui::Button("/", ImVec2(60, 60)) && a != 0 ) { // button for divison
+            if (ImGui::Button("/", ImVec2(80, 80)) && a != 0 ) { // button for divison
                 next = true; divide = true; decadd = false;
             } ImGui::SameLine();
 
-			if (ImGui::Button("*", ImVec2(60, 60)) && a != 0) { // button for multiplication
+			if (ImGui::Button("*", ImVec2(80, 80)) && a != 0) { // button for multiplication
                     next = true; multiply = true; decadd = false;
                 } ImGui::SameLine();
 
-			if (ImGui::Button("+", ImVec2(60, 60)) && a != 0) { // button for addition
+			if (ImGui::Button("+", ImVec2(80, 80)) && a != 0) { // button for addition
                     next = true; add = true; decadd = false;
                 } ImGui::SameLine();
 
-            if (ImGui::Button("-", ImVec2(60, 60)) && a != 0) { // for subtraction
+            if (ImGui::Button("-", ImVec2(80, 80)) && a != 0) { // for subtraction
                     next = true; subtract = true; decadd = false;
-               } ImGui::SameLine();
+               } 
+            //nextline
+            if (ImGui::Button(".", ImVec2(80, 80)) && a != 0) {   // enable decimal input
+                decadd = true;
+			} ImGui::SameLine();		
 
-			if (ImGui::Button("^x", ImVec2(60, 60)) && a != 0) { // for exponentiation
+			if (ImGui::Button("^x", ImVec2(80, 80)) && a != 0) { // for exponentiation
                     next = true; power = true; decadd = false;
-                } 
-            if (ImGui::Button("^1/x", ImVec2(60, 60)) && a != 0) { // for root
+            }  ImGui::SameLine();
+
+            if (ImGui::Button("^1/x", ImVec2(80, 80)) && a != 0) { // for root
                     next = true; root = true; decadd = false;
             } ImGui::SameLine();
-			if (ImGui::Button(".", ImVec2(60, 60)) && a != 0) {   // enable decimal input
-                decadd = true;
-            } ImGui::End();
-        } 
-    
+
+            if (ImGui::Button("1/x", ImVec2(80, 80)))
+                next ? b = 1 / b
+                     : a = 1 / a;
+
+            ImGui::PopStyleColor();
+                ImGui::End();  // calculator window end   
+            
+          
 
     // Rendering
     ImGui::Render();
