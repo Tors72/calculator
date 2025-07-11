@@ -1,10 +1,3 @@
-// Dear ImGui: standalone example application for DirectX 11
-
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -13,7 +6,7 @@
 #include <tchar.h>
 #include <chrono>
 #include <iostream>
-#include <cmath>   //ERROR BECAUSE CALC.EXE IN ANOTHER SUBFOLDER THAN EXPECTED
+#include <cmath>  
 
 // Data
 static ID3D11Device*            g_pd3dDevice = nullptr;
@@ -77,59 +70,14 @@ int main(int, char**)
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //style.FontSizeBase = 20.0f;
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf");
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf");
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf");
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf");
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf");
-    //IM_ASSERT(font != nullptr);
-
-    // Our state
-    bool show_demo_window = true;
-    bool show_another_window = false;
+    // state
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    int width = GetSystemMetrics(SM_CXSCREEN); // Get screen width
-    int height = GetSystemMetrics(SM_CYSCREEN); // Get screen height
-    bool opened = true;
     bool done = false;
-
-    char name[30] = "";
-    float clr[3] = { 0.0f, 0.0f, 0.0f };
-    bool show_color_picker = false;
-    int button_clicks = 0;
-    bool checkbox = false;
-    bool show_calculator = false; // Flag to show/hide the second window
-	bool show_calculator2 = false; // Flag to show/hide the second calculator window
-
-    int intslider = 10;
-    float fslider = 10.0f; //slider variable
-
-    static auto last_time = std::chrono::high_resolution_clock::now(); // Last frame time
-    static int fps = 0; // Frames per second counter
-    static int frames = 0; // Frame counter
-    static auto fps_time = std::chrono::high_resolution_clock::now(); // Time for FPS calculation
 
     while (!done)
     {
-        frames++; // Increment frame count
-        auto now = std::chrono::high_resolution_clock::now(); // Get current time
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - fps_time).count(); // Calculate duration since last FPS update
-        if (duration > 1000) { // If more than 1 second has passed
-            fps = frames; // Update FPS
-            frames = 0; // Reset frame count
-            fps_time = now; // Update FPS time
-        }
         // Poll and handle messages (inputs, window resize, etc.)
         // See the WndProc() function below for our to dispatch events to the Win32 backend.
         MSG msg;
@@ -167,11 +115,13 @@ int main(int, char**)
 
         //ImGui Style
         ImGuiStyle& style = ImGui::GetStyle();
+
         style.Colors[ImGuiCol_Button] = ImVec4( 203 / 255.0f, 255 / 255.0f, 203 / 255.0f, 1.0f); //205,155,89
         style.Colors[ImGuiCol_ButtonHovered] = ImVec4( 143 / 255.0f, 78 / 255.0f, 81 / 255.0f, 1.0f); //143, 78, 81
         style.Colors[ImGuiCol_ButtonActive] = ImVec4( 108 / 255.0f, 37 / 255.0f, 103 / 255, 1.0f);
 		style.Colors[ImGuiCol_WindowBg] = ImVec4( 221 / 255.0f, 221 / 255.0f, 221 / 255.0f, 1.0f); // 209, 176, 132
         style.Colors[ImGuiCol_Text] = ImVec4(.0f, .0f, .0f, 1.0f);
+
 		style.FrameRounding = 10.0f; 
         style.WindowRounding = 5.0f;
 
@@ -188,7 +138,7 @@ int main(int, char**)
             static bool subtract = false; static bool add = false;  static bool multiply = false; static bool divide = false; static bool power = false; //operators
             static bool root = false;
 
-            ImGui::Begin("Calculator", &show_calculator); 
+            ImGui::Begin("Calculator"); 
 
             ( a == int (a) ) 
                 ? ImGui::Text("first number = %i", (int)a) 
@@ -252,14 +202,14 @@ int main(int, char**)
                       : subtract
                         ? (x - b)
                         : multiply
-                            ? (x * b)
-                            : divide
-                                ? (x / b)
-                                : power
-                                    ? pow(x, b)
-                                    : root
-                                        ? pow(x, 1 / b)
-                                        : 0;
+                          ? (x * b)
+                          : divide
+                            ? (x / b)
+                            : power
+                              ? pow(x, b)
+                              : root
+                                ? pow(x, 1 / b)
+                                : 0;
               } ImGui::PopStyleColor(1);
                
 
@@ -299,9 +249,8 @@ int main(int, char**)
                      : a = 1 / a;
 
             ImGui::PopStyleColor();
-                ImGui::End();  // calculator window end   
-            
-          
+         ImGui::End();  // calculator window end   
+
 
     // Rendering
     ImGui::Render();
