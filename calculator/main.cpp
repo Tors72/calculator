@@ -52,7 +52,7 @@ int main(int, char**)
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;  //FONTS
-	io.Fonts->AddFontFromFileTTF("imgui/misc/fonts/Cousine-Regular.ttf", 24.0f);
+	io.Fonts->AddFontFromFileTTF("../imgui/misc/fonts/Poppins-Bold.ttf", 28.0f);
 
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -116,11 +116,11 @@ int main(int, char**)
 		//ImGui Style
 		ImGuiStyle& style = ImGui::GetStyle();
 
-		style.Colors[ImGuiCol_Button] = ImVec4( 203 / 255.0f, 255 / 255.0f, 203 / 255.0f, 1.0f); //205,155,89
-		style.Colors[ImGuiCol_ButtonHovered] = ImVec4( 143 / 255.0f, 78 / 255.0f, 81 / 255.0f, 1.0f); //143, 78, 81
+		style.Colors[ImGuiCol_Button] = ImVec4( 55 / 255.0f, 65 / 255.0f, 81 / 255.0f, 1.0f); //rgb(55, 65, 81)
+		style.Colors[ImGuiCol_ButtonHovered] = ImVec4( 75 / 255.0f, 85 / 255.0f, 99 / 255.0f, 1.0f); // 75, 85, 99
 		style.Colors[ImGuiCol_ButtonActive] = ImVec4( 108 / 255.0f, 37 / 255.0f, 103 / 255, 1.0f);
-		style.Colors[ImGuiCol_WindowBg] = ImVec4( 221 / 255.0f, 221 / 255.0f, 221 / 255.0f, 1.0f); // 209, 176, 132
-		style.Colors[ImGuiCol_Text] = ImVec4(.0f, .0f, .0f, 1.0f);
+		style.Colors[ImGuiCol_WindowBg] = ImVec4( 31 / 255.0f, 41 / 255.0f, 55 / 255.0f, 1.0f); //rgb(31, 41, 55)
+		style.ItemSpacing = ImVec2(12.0f, 12.0f);// Indentation for tree nodes and collapsing headers
 
 		style.FrameRounding = 10.0f; 
 		style.WindowRounding = 5.0f;
@@ -152,12 +152,12 @@ int main(int, char**)
 				? ImGui::Text("result = %i", (int)result)      
 				: ImGui::Text("result = %Lf", result);
 			
-
-			for (int i = 1; i <= 9; i++) {                        // buttons for numbers 1-9
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 45.0f);
+			for (int i = 1; i <= 9; i++) {                        
 				char label[8];
 				snprintf(label, sizeof(label), "%i", i);
 				ImGuiKey keycode = (ImGuiKey)(ImGuiKey_0 + i);
-				if (ImGui::Button(label, ImVec2(80, 80)) || ImGui::IsKeyPressed(keycode)) { // add key event for number keys
+				if (ImGui::Button(label, ImVec2(100, 80)) || ImGui::IsKeyPressed(keycode)) { // add key event for number keys
 					(next)
 						? (decadd
 							? (b += i * pow(10.0f, --b_dec_places))
@@ -167,13 +167,14 @@ int main(int, char**)
 							: (a = a * 10 + i));
 				}
 					if (i % 3 != 0) ImGui::SameLine();
+
+					else ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 45.0f);
 				
 			}
-			// ImGui::PushStyleColor(ImGuiCol_Button, ImVec4( 161 / 255.0f , 214 / 255.0f, 161 / 255.0f , 1.0f));
-
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4( 147 / 255.0f, 204 / 255.0f, 147 / 255.0f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(220 / 255.0f, 38 / 255.0f, 38 / 255.0f, 1.0f));
+			  //// rgb(95, 26, 152)
 			  {
-				if (ImGui::Button("CE", ImVec2(80, 80)) || ImGui::IsKeyPressed(ImGuiKey_C)) {                    // clear button
+				if (ImGui::Button("CE", ImVec2(100, 80)) || ImGui::IsKeyPressed(ImGuiKey_C)) {                    // clear button
 					a = 0; b = 0;
 					next = false;
 					add = false; subtract = false; multiply = false; divide = false; power = false; root = false; decadd = false; result = 0; a_dec_places = 0; b_dec_places = 0;
@@ -181,7 +182,7 @@ int main(int, char**)
 			  }   
 			ImGui::PopStyleColor();
 
-			if (ImGui::Button("0", ImVec2(80, 80)) || ImGui::IsKeyPressed(ImGuiKey_0)) {                      // zero button
+			if (ImGui::Button("0", ImVec2(100, 80)) || ImGui::IsKeyPressed(ImGuiKey_0)) {                      // zero button
 				(next && b != 0)
 					? (b = (b * 10) + 0)
 					: (next)
@@ -191,10 +192,10 @@ int main(int, char**)
 							: (a = 0);
 			}
 			  ImGui::SameLine();
-
-			  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(147 / 255.0f, 204 / 255.0f, 147 / 255.0f, 1.0f));
+			  //220, 38, 38
+			  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(95 / 255.0f, 26 / 255.0f, 152 / 255.0f, 1.0f));
 			  
-			  if (ImGui::Button("=", ImVec2(80, 80)) || ImGui::IsKeyPressed(ImGuiKey_Equal) || ImGui::IsKeyPressed(ImGuiKey_Enter)) {
+			  if (ImGui::Button("=", ImVec2(100, 80)) || ImGui::IsKeyPressed(ImGuiKey_Equal) || ImGui::IsKeyPressed(ImGuiKey_Enter)) {
 				  int x;
 				  result == 0
 					  ? x = a
@@ -215,41 +216,42 @@ int main(int, char**)
 			  } ImGui::PopStyleColor(1);
 			   
 
-			ImGui::NewLine(); //161, 214, 161
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4( 161 / 255.0f , 214 / 255.0f, 161 / 255.0f , 1.0f));
+			ImGui::NewLine(); //147, 51, 234
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(147 / 255.0f, 51 / 255.0f, 234 / 255.0f, 1.0f));
+			style.Colors[ImGuiCol_ButtonHovered] = ImVec4(126 / 255.0f, 34 / 255.0f, 206 / 255.0f, 1.0f); // 126, 34, 206
 
-			if (ImGui::Button("/", ImVec2(80, 80)) && a != 0 ) { // button for divison
+			if (ImGui::Button("/", ImVec2(100, 80)) && a != 0 ) { // button for divison
 				next = true; divide = true; decadd = false;
 			} ImGui::SameLine();
 			if ( ImGui::IsKeyPressed(ImGuiKey_Slash) && a != 0 ) { // add key event for division
 				next = true; divide = true; decadd = false;
 			}
 
-			if (ImGui::Button("*", ImVec2(80, 80)) && a != 0) { // button for multiplication
+			if (ImGui::Button("*", ImVec2(100, 80)) && a != 0) { // button for multiplication
 					next = true; multiply = true; decadd = false;
 				} ImGui::SameLine();
 
-			if (ImGui::Button("+", ImVec2(80, 80)) && a != 0) { // button for addition
+			if (ImGui::Button("+", ImVec2(100, 80)) && a != 0) { // button for addition
 					next = true; add = true; decadd = false;
 				} ImGui::SameLine();
 
-			if (ImGui::Button("-", ImVec2(80, 80)) && a != 0) { // for subtraction
+			if (ImGui::Button("-", ImVec2(100, 80)) && a != 0) { // for subtraction
 					next = true; subtract = true; decadd = false;
 			   } 
 			//nextline
-			if (ImGui::Button(".", ImVec2(80, 80)) && a != 0) {   // enable decimal input
+			if (ImGui::Button(".", ImVec2(100, 80)) && a != 0) {   // enable decimal input
 				decadd = true;
 			} ImGui::SameLine();		
 
-			if (ImGui::Button("^x", ImVec2(80, 80)) && a != 0) { // for exponentiation
+			if (ImGui::Button("^x", ImVec2(100, 80)) && a != 0) { // for exponentiation
 					next = true; power = true; decadd = false;
 			}  ImGui::SameLine();
 
-			if (ImGui::Button("^1/x", ImVec2(80, 80)) && a != 0) { // for root
+			if (ImGui::Button("^1/x", ImVec2(100, 80)) && a != 0) { // for root
 					next = true; root = true; decadd = false;
 			} ImGui::SameLine();
 
-			if (ImGui::Button("1/x", ImVec2(80, 80)))
+			if (ImGui::Button("1/x", ImVec2(100, 80)))
 				next ? b = 1 / b
 					 : a = 1 / a;
 
